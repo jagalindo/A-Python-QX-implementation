@@ -33,9 +33,13 @@ def Diff(li1, li2):
     li_dif = [i for i in li1 + li2 if i not in li1 or i not in li2] 
     return li_dif 
 
-model=sys.argv[1]
-requirements=sys.argv[2]
-outFile=sys.argv[3]
+#model=sys.argv[1]
+#requirements=sys.argv[2]
+#outFile=sys.argv[3]
+
+model="./cnf/aircraft_fm.xml.cnf"
+requirements="./cnf/aircraft_fm.xml.cnf_conf/1"
+outFile="./out.txt"
 
 modelCNF = CNF(from_file=model)
 requirementsCNF = CNF(from_file=requirements)
