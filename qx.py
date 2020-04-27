@@ -2,10 +2,15 @@ from pysat.formula import CNF
 from pysat.solvers import Glucose3
 import sys
 
+modelCNFClauses=[]
+
 
 #---------------------------------------------------------
+def l2s(C):  
+	return str(Diff(C,modelCNFClauses))
 
 def isConsistent(AC):
+	print(l2s(AC))
 	g = Glucose3()
 	for clause in AC:
 		g.add_clause(clause)
@@ -26,7 +31,7 @@ def QX(C,B,Bo):
 		return []
 	
 	if len(C) == 1:
-		return C[0] //Devuelvo el primer elemento
+		return C 
 		
 	k=int(len(C)/2) 
 	Ca=C[0:k]
@@ -35,19 +40,22 @@ def QX(C,B,Bo):
 	A1=QX(Cb,B+A2,A2)
 	return A1 + A2
 
-def Diff(li1, li2): 
-    li_dif = [i for i in li1 + li2 if i not in li1 or i not in li2] 
-    return li_dif 
+def Diff(x, y): 
+	li_dif = [item for item in x if item not in y]
+	#li_dif = [i for i in x + y if i not in x or i not in y] 
+	return li_dif 
 
-model=sys.argv[1]
-requirements=sys.argv[2]
-outFile=sys.argv[3]
+#model=sys.argv[1]
+#requirements=sys.argv[2]
+#outFile=sys.argv[3]
+
+model="./cnf/TS/QX33.cnf"
+requirements="./cnf/TS/QX33_prod.cnf"
+outFile="./out.txt"
 
 modelCNF = CNF(from_file=model)
 requirementsCNF = CNF(from_file=requirements)
+modelCNFClauses=modelCNF.clauses
 
-result= quickXplain(modelCNF.clauses, requirementsCNF.clauses)
-resCNF= CNF()
-for c in result:
-	resCNF.append(c)
-resCNF.to_file(outFile)
+result= quickXplain(requirementsCNF.clauses,modelCNF.clauses)
+print(result)

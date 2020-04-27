@@ -14,7 +14,12 @@ modelCNFClauses=[]
 #-------------------------------------------------------
 # Function to create a hash. Stupedly by now   
 def l2s(C):  
-	return str(Diff(C,modelCNFClauses))
+	
+	clauses=Diff(C,modelCNFClauses)
+	results= sorted(clauses, key=sub)
+	return str(results)
+
+def sub(C): return C[0]
 
 def Diff(x, y): 
 	li_dif = [item for item in x if item not in y]
@@ -28,6 +33,10 @@ def consistencyCheck(AC):
 	return g.solve()
 
 def AddCC(C):
+	#print(C)
+	#print(l2s(C))
+	#print(consistencyCheck(C))
+	#print("-------------------")
 	cache[l2s(C)]=consistencyCheck(C)
 	
 def LookUpCC(C):
@@ -44,10 +53,10 @@ def existConsistencyCheck(C):
 def inconsistent(C,B,Bo):
 	if not existConsistencyCheck(B):
 		QXGen(C,Bo,Diff(B,Bo),Bo,0)
-	return (not LookUpCC(B)) #check the shared table
-
+	return ( not LookUpCC(B)) #check the shared table
+	
 def quickXplain(C, B):
-	if not inconsistent(C,B,[]):
+	if consistencyCheck(B + C):
 		return "No Conflict"
 	elif len(C)==0:
 		return []
@@ -92,13 +101,14 @@ def QXGen(C, Bd, B, o, l):
 #requirements=sys.argv[2]
 #outFile=sys.argv[3]
 
-model="./cnf/model.cnf"
-requirements="./cnf/prod.cnf"
-outFile="./out.txt"
+model="./cnf/TS/QX33.cnf"
+requirements="./cnf/TS/QX33_prod.cnf"
+#outFile="./out.txt"
 
 
 modelCNF = CNF(from_file=model)
 requirementsCNF = CNF(from_file=requirements)
 modelCNFClauses=modelCNF.clauses
 result= quickXplain(requirementsCNF.clauses,modelCNF.clauses)
+print(len(cache))
 print (result)
