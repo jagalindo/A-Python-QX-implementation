@@ -1,7 +1,7 @@
 from pysat.formula import CNF
 from pysat.solvers import Glucose3
 import sys
-
+import time
 modelCNFClauses=[]
 
 
@@ -56,6 +56,9 @@ outFile="./out.txt"
 modelCNF = CNF(from_file=model)
 requirementsCNF = CNF(from_file=requirements)
 modelCNFClauses=modelCNF.clauses
-
+starttime = time.time()
 result= quickXplain(requirementsCNF.clauses,modelCNF.clauses)
+reqtime = time.time() - starttime
+print(reqtime)
+
 print(result)

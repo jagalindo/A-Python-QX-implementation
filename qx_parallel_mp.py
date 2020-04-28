@@ -1,20 +1,15 @@
 from pysat.formula import CNF
 from pysat.solvers import Glucose3
+import multiprocessing as mp
 import sys
-
-#-------------------------------------------------------
-#--------------Gloval variable definition---------------
-#-------------------------------------------------------
-lmax=50
-cache={}
-modelCNFClauses=[]
+import time
 
 #-------------------------------------------------------
 #------------Auxiliary functions definition-------------
 #-------------------------------------------------------
-# Function to create a hash. Stupedly by now   
-def l2s(C):  
-	
+# Function to create a hash. 
+def l2s(C): 
+	global modelCNFClauses
 	clauses=Diff(C,modelCNFClauses)
 	results= sorted(clauses, key=sub)
 	return str(results)
@@ -25,26 +20,31 @@ def Diff(x, y):
 	li_dif = [item for item in x if item not in y]
 	#li_dif = [i for i in x + y if i not in x or i not in y] 
 	return li_dif 
-	
+
+def LookUpCC(C):
+	global cache
+	result=cache.get(l2s(C))
+	return result.get()
+
+def existConsistencyCheck(C):
+	return (l2s(C) in cache)
+
+#-------------------------------------------------------
+#------------Auxiliary Parallel functions definition-------------
+#-------------------------------------------------------
+
 def consistencyCheck(AC):
 	g = Glucose3()
 	for clause in AC: #AC es conjunto de conjuntos
 		g.add_clause(clause)
 	return g.solve()
 
-def AddCC(C):
-	#print(C)
-	#print(l2s(C))
-	#print(consistencyCheck(C))
-	#print("-------------------")
-	cache[l2s(C)]=consistencyCheck(C)
-	
-def LookUpCC(C):
-	return cache.get(l2s(C))
 
-def existConsistencyCheck(C):
-	return (l2s(C) in cache)
 
+#def AddCC(result):
+#	global cache
+#	print(result)
+#	cache.update(result)
 
 #-------------------------------------------------------
 #-----------------QX functions definition---------------
@@ -81,8 +81,13 @@ def QX(C,B,Bo):
 def QXGen(C, Bd, B, o, l):
 	if l< lmax :
 		if len(o)>0 :
-			AddCC(Bd + B)#asincronous call to ask for that consistency check
-		
+			#launch mp of the consistency and store with a callback func
+			#pool.apply_async(consistencyCheckParallel,args=([Bd+B]),callback=AddCC)
+			global l2s
+			union=Bd+B
+			hash=l2s(union)
+			future=pool.apply_async(consistencyCheck,args=([union]))
+			cache.update({hash:future})
 	if len(C)==1 and len(Bd)>0:
 		QXGen(Bd,[],B+[C[0]],C[0],l+1)
 		
@@ -96,6 +101,10 @@ def QXGen(C, Bd, B, o, l):
 		QXGen([Bd[0]],Diff(Bd,[Bd[0]]),B,[],l+1)
 		
 #-------------------------------------------------------
+#--------------Gloval variable definition---------------
+#-------------------------------------------------------
+lmax=1
+cache={}
 
 #model=sys.argv[1]
 #requirements=sys.argv[2]
@@ -109,6 +118,14 @@ outFile="./out.txt"
 modelCNF = CNF(from_file=model)
 requirementsCNF = CNF(from_file=requirements)
 modelCNFClauses=modelCNF.clauses
+pool = mp.Pool(mp.cpu_count()-1)
+starttime = time.time()
 result= quickXplain(requirementsCNF.clauses,modelCNF.clauses)
+reqtime = time.time() - starttime
+
+pool.close()
+pool.join()
+#time.sleep(10)
 print(len(cache))
 print (result)
+print(reqtime)
