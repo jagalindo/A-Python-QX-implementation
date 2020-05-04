@@ -1,62 +1,53 @@
 from pysat.formula import CNF
-from pysat.solvers import Glucose3
 import multiprocessing as mp
+import utils
 import sys
 import time
+import os
 
 #-------------------------------------------------------
 #------------Auxiliary functions definition-------------
 #-------------------------------------------------------
 # Function to create a hash. 
-def l2s(C): 
-	global modelCNFClauses
-	clauses=Diff(C,modelCNFClauses)
-	results= sorted(clauses, key=sub)
-	return str(results)
 
-def sub(C): return C[0]
-
-def Diff(x, y): 
-	li_dif = [item for item in x if item not in y]
-	#li_dif = [i for i in x + y if i not in x or i not in y] 
-	return li_dif 
 
 def LookUpCC(C):
-	global cache
-	result=cache.get(l2s(C))
+	global cache,count
+	result=cache.get(utils.getHash(C,len(modelCNF.clauses)))
+	if result.ready() :
+		count=count+1
 	return result.get()
 
 def existConsistencyCheck(C):
-	return (l2s(C) in cache)
+	return (utils.getHash(C,len(modelCNF.clauses)) in cache)
 
 #-------------------------------------------------------
 #------------Auxiliary Parallel functions definition-------------
 #-------------------------------------------------------
 
-def consistencyCheck(AC):
-	g = Glucose3()
-	for clause in AC: #AC es conjunto de conjuntos
-		g.add_clause(clause)
-	return g.solve()
+def callConsistencyCheck(AC):
+	sol=utils.consistencyCheck(AC)
+	time.sleep(sleepTime)
+	return sol
 
-
-
-#def AddCC(result):
-#	global cache
-#	print(result)
-#	cache.update(result)
-
+def f(AC):
+	res=0
+	for C in AC:
+		res=res+len(C)
+	return res
 #-------------------------------------------------------
 #-----------------QX functions definition---------------
 #-------------------------------------------------------
 
-def inconsistent(C,B,Bo):
+def inconsistent(C,B,Bd):
 	if not existConsistencyCheck(B):
-		QXGen(C,Bo,Diff(B,Bo),Bo,0)
-	return ( not LookUpCC(B)) #check the shared table
+		QXGen([C],[Bd],[utils.Diff(B,Bd)],[Bd],0)
+		time.sleep(lockTime)
+	return (not LookUpCC(B)) #check the shared table
 	
 def quickXplain(C, B):
-	if consistencyCheck(B + C):
+
+	if utils.consistencyCheck(C+B):
 		return "No Conflict"
 	elif len(C)==0:
 		return []
@@ -78,54 +69,67 @@ def QX(C,B,Bo):
 	A1=QX(Cb,B+A2,A2)
 	return A1 + A2
 
-def QXGen(C, Bd, B, o, l):
-	if l< lmax :
-		if len(o)>0 :
-			#launch mp of the consistency and store with a callback func
-			#pool.apply_async(consistencyCheckParallel,args=([Bd+B]),callback=AddCC)
-			global l2s
-			union=Bd+B
-			hash=l2s(union)
-			future=pool.apply_async(consistencyCheck,args=([union]))
-			cache.update({hash:future})
-	if len(C)==1 and len(Bd)>0:
-		QXGen(Bd,[],B+[C[0]],C[0],l+1)
-		
-	elif len(C)>1 :
-		k=int(len(C)/2) 
-		Ca=C[0:k]
-		Cb=C[k:len(C)]
-		QXGen(Ca,Cb + Bd,B,Cb,l+1)
 
-	if len(Bd)>0 and len(o)>0  :
-		QXGen([Bd[0]],Diff(Bd,[Bd[0]]),B,[],l+1)
+def QXGen(C, Bd, B, d, l):
+	if l< lmax :
+		if f(d)>0 :
+			u=utils.union(B,Bd)
+			hash=utils.getHash(u,len(modelCNF.clauses))
+			if (not (hash in cache)):#evito crear multiples hilos si ya esta en ejecución 
+				future=pool.apply_async(callConsistencyCheck,args=([u]))
+				cache.update({hash:future})
+	
+		if f(C)==1 and f(Bd)>0:
+			QXGen(Bd,[],B+[C[0]],[C[0]],l+1)
 		
+		elif f(C)>1 :
+			if(len(C)>1):
+				k=int(len(C)/2) 
+				Ca=C[0:k]
+				Cb=C[k:len(C)]
+			else :
+				k=int(len(C[0])/2) 
+				Ca=[C[0][0:k]]
+				Cb=[C[0][k:len(C[0])]]
+			QXGen(Ca,Cb + Bd,B,Cb,l+1)
+		if f(Bd)>0 and f(d)>0  :
+			QXGen([Bd[0]],utils.Diff(Bd,[Bd[0]]),B,[],l+1)
+
+
+
 #-------------------------------------------------------
 #--------------Gloval variable definition---------------
 #-------------------------------------------------------
-lmax=1
-cache={}
+if __name__ == '__main__':
+	lmax=1
+	cache={}
+	count=0
+	
+	sleepTime=0 #can be used to simulate harder problems
+	lockTime=0 #can be used to simulate harder problems
 
-#model=sys.argv[1]
-#requirements=sys.argv[2]
-#outFile=sys.argv[3]
+	if len(sys.argv) > 1:
+		model=sys.argv[1]
+		requirements=sys.argv[2]
+		lmax=int(sys.argv[3])
+	else:
+		requirements="../QX-Benchmark/cnf/betty/model-5000-50-1/model-5000-50-1-100-0.prod"
+		model="../QX-Benchmark/cnf/betty/model-5000-50-1.cnf"
+		requirements="./cnf/AutomotiveRQ.cnf"
+		model="./cnf/LargeAutomotive.dimacs"
+		#requirements="./cnf/bench/frb59-26-1.cnf_prod"
+		#model="./cnf/bench/frb59-26-1.cnf"
 
-model="./cnf/TS/QX33.cnf"
-requirements="./cnf/TS/QX33_prod.cnf"
-outFile="./out.txt"
+	modelCNF = CNF(from_file=requirements)
+	requirementsCNF = CNF(from_file=model)
 
+	#Vamos a almacenar el id con la C
+	B=sorted(enumerate(modelCNF.clauses,0), key=lambda x: x[0])
+	C=sorted(enumerate(requirementsCNF.clauses,len(modelCNF.clauses)), key=lambda x: x[0])
 
-modelCNF = CNF(from_file=model)
-requirementsCNF = CNF(from_file=requirements)
-modelCNFClauses=modelCNF.clauses
-pool = mp.Pool(mp.cpu_count()-1)
-starttime = time.time()
-result= quickXplain(requirementsCNF.clauses,modelCNF.clauses)
-reqtime = time.time() - starttime
-
-pool.close()
-pool.join()
-#time.sleep(10)
-print(len(cache))
-print (result)
-print(reqtime)
+	pool = mp.Pool(mp.cpu_count()-1)
+	starttime = time.time()
+	result= quickXplain(C,B)
+	reqtime = time.time() - starttime
+	print(os.path.basename(requirements).replace(".prod","").replace("model-","").replace("-","|")+"|"+str(reqtime)+"|"+str(count+1)+"|"+str(len(cache)+1)+"|"+"qx_parallel_mp|"+str(lmax)+"|"+str(result))
+	pool.close()

@@ -1,24 +1,24 @@
 from pysat.formula import CNF
-from pysat.solvers import Glucose3
+import utils
+
 import sys
 import time
-modelCNFClauses=[]
-
+import os
+import time
+count=0
 
 #---------------------------------------------------------
-def l2s(C):  
-	return str(Diff(C,modelCNFClauses))
 
-def isConsistent(AC):
-	print(l2s(AC))
-	g = Glucose3()
-	for clause in AC:
-		g.add_clause(clause)
-	return g.solve()
+def callConsistencyCheck(AC):
+	global count
+	count=count+1
+	sol=utils.consistencyCheck(AC)
+	time.sleep(sleepTime)
+	return sol
 
 
 def quickXplain(C, B):
-	if isConsistent(B + C):
+	if callConsistencyCheck(B + C):
 		return "No Conflict"
 	elif len(C)==0:
 		return []
@@ -27,7 +27,8 @@ def quickXplain(C, B):
 		
 	
 def QX(C,B,Bo):
-	if len(Bo)!=0 and not isConsistent(B):
+	time.sleep(lockTime)
+	if len(Bo)!=0 and not callConsistencyCheck(B):
 		return []
 	
 	if len(C) == 1:
@@ -40,25 +41,29 @@ def QX(C,B,Bo):
 	A1=QX(Cb,B+A2,A2)
 	return A1 + A2
 
-def Diff(x, y): 
-	li_dif = [item for item in x if item not in y]
-	#li_dif = [i for i in x + y if i not in x or i not in y] 
-	return li_dif 
+if __name__ == '__main__':
 
-#model=sys.argv[1]
-#requirements=sys.argv[2]
-#outFile=sys.argv[3]
+	if len(sys.argv) > 1:
+		model=sys.argv[1]
+		requirements=sys.argv[2]
 
-model="./cnf/TS/QX33.cnf"
-requirements="./cnf/TS/QX33_prod.cnf"
-outFile="./out.txt"
+	else :
+		requirements="../QX-Benchmark/cnf/betty/model-5000-50-1/model-5000-50-1-100-0.prod"
+		model="../QX-Benchmark/cnf/betty/model-5000-50-1.cnf"
+		requirements="./cnf/AutomotiveRQ.cnf"
+		model="./cnf/LargeAutomotive.dimacs"
+		#requirements="./cnf/bench/frb59-26-1.cnf_prod"
+		#model="./cnf/bench/frb59-26-1.cnf"
 
-modelCNF = CNF(from_file=model)
-requirementsCNF = CNF(from_file=requirements)
-modelCNFClauses=modelCNF.clauses
-starttime = time.time()
-result= quickXplain(requirementsCNF.clauses,modelCNF.clauses)
-reqtime = time.time() - starttime
-print(reqtime)
-
-print(result)
+	modelCNF = CNF(from_file=model)
+	requirementsCNF = CNF(from_file=requirements)
+	
+	sleepTime=0 #can be used to simulate harder problems
+	lockTime=0 #can be used to simulate harder problems
+	
+	M_C=sorted(enumerate(modelCNF.clauses), key=lambda x: x[0])
+	RQ_C=sorted(enumerate(requirementsCNF.clauses,len(modelCNF.clauses)), key=lambda x: x[0])
+	starttime = time.time()
+	result= quickXplain(RQ_C,M_C)
+	reqtime = time.time() - starttime
+	print(os.path.basename(requirements).replace(".prod","").replace("model-","").replace("-","|")+"|"+str(reqtime)+"|"+str(count)+"|"+str(count)+"|"+"qx|0|"+str(result))
