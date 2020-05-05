@@ -1,15 +1,19 @@
 from pysat.formula import CNF
 from pysat.solvers import Glucose3
 import sys
+count=0
+
 def isConsistent(AC):
+	global count
+	count=count+1
 	g = Glucose3()
 	for clause in AC:
 		g.add_clause(clause)
 	return g.solve()
 
 def fmdiag(S, AC):
-	print(S)
-	print(AC)
+	#print(S)
+	#print(AC)
 	if len(S)==0 or not isConsistent(Diff(AC,S)):
 		return []
 	else:
@@ -37,8 +41,10 @@ def Diff(li1, li2):
 #requirements=sys.argv[2]
 #outFile=sys.argv[3]
 
-model="./cnf/aircraft_fm.xml.cnf"
-requirements="./cnf/aircraft_fm.xml.cnf_conf/1"
+#model="./cnf/aircraft_fm.xml.cnf"
+#requirements="./cnf/aircraft_fm.xml.cnf_conf/1"
+requirements="../QX-Benchmark/cnf/betty/5000_30_0/16-50-4.prod"
+model="../QX-Benchmark/cnf/betty/5000_30_0.cnf"
 outFile="./out.txt"
 
 modelCNF = CNF(from_file=model)
@@ -49,3 +55,4 @@ resCNF= CNF()
 for c in result:
 	resCNF.append(c)
 resCNF.to_file(outFile)
+print(count)

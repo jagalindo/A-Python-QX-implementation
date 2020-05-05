@@ -9,6 +9,7 @@ def getHash(C,l):
     #print(str(C))
     #smallList=list(filter(lambda x: x[0] > l, C))
     C=sorted([i for i in C if i[0] >=l],key=lambda x: x[0])
+    #C=sorted(C,key=lambda x: x[0])
     #p = pickle.dumps([i for i in C if i[0] >=l], -1)
     #return hash(p)
     return str(C)

@@ -1,6 +1,6 @@
 from pysat.formula import CNF
 import utils
-
+import random
 import sys
 import time
 import os
@@ -13,8 +13,6 @@ def callConsistencyCheck(AC):
 	global count
 	count=count+1
 	utils.getHash(AC,len(modelCNF.clauses))
-	utils.getHash(AC,len(modelCNF.clauses))
-
 	sol=utils.consistencyCheck(AC)
 	time.sleep(sleepTime)
 	return sol
@@ -40,9 +38,9 @@ def QX(C,B,Bo):
 	k=int(len(C)/2) 
 	Ca=C[0:k]
 	Cb=C[k:len(C)]
-	A2=QX(Ca,B+Cb,Cb)
-	A1=QX(Cb,B+A2,A2)
-	return A1 + A2
+	A2=QX(Ca,(B+Cb),Cb)
+	A1=QX(Cb,(B+A2),A2)
+	return (A1 + A2)
 
 if __name__ == '__main__':
 
@@ -51,16 +49,17 @@ if __name__ == '__main__':
 		requirements=sys.argv[2]
 
 	else :
-		requirements="../QX-Benchmark/cnf/betty/5000_30_0/16-50-4.prod"
-		model="../QX-Benchmark/cnf/betty/5000_30_0.cnf"
-		#requirements="./cnf/AutomotiveRQ.cnf"
-		#model="./cnf/LargeAutomotive.dimacs"
+		#requirements="../QX-Benchmark/cnf/betty/5000_30_0/16-50-4.prod"
+		#model="../QX-Benchmark/cnf/betty/5000_30_0.cnf"
+		requirements="./cnf/AutomotiveRQ.cnf"		
+		#requirements="./cnf/auto_fail.cnf"
+		model="./cnf/LargeAutomotive.dimacs"
 		#requirements="./cnf/bench/frb59-26-1.cnf_prod"
 		#model="./cnf/bench/frb59-26-1.cnf"
 		#requirements="./cnf/ecos-icse11.dimacs_prod"
 		#model="./cnf/ecos-icse11.dimacs"
-		#requirements="./cnf/bench/frb40-19-1.cnf_prod"
-		#model="./cnf/bench/frb40-19-1.cnf"
+		#requirements="./cnf/TS/QX11_prod.cnf"
+		#model="./cnf/TS/QX11.cnf"
 
 	modelCNF = CNF(from_file=model)
 	requirementsCNF = CNF(from_file=requirements)
@@ -70,6 +69,7 @@ if __name__ == '__main__':
 	
 	M_C=sorted(enumerate(modelCNF.clauses), key=lambda x: x[0])
 	RQ_C=sorted(enumerate(requirementsCNF.clauses,len(modelCNF.clauses)), key=lambda x: x[0])
+	#random.shuffle(RQ_C)
 	starttime = time.time()
 	result= quickXplain(RQ_C,M_C)
 	reqtime = time.time() - starttime

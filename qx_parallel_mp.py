@@ -11,15 +11,16 @@ import os
 # Function to create a hash. 
 
 
-def LookUpCC(C):
+def LookUpCC(hash):
 	global cache,count
-	result=cache.get(utils.getHash(C,len(modelCNF.clauses)))
+	result=cache.get(hash)
+	#print("Pido: "+str(hash))
 	if result.ready() :
 		count=count+1
 	return result.get()
 
-def existConsistencyCheck(C):
-	return (utils.getHash(C,len(modelCNF.clauses)) in cache)
+def existConsistencyCheck(hash):
+	return (hash in cache)
 
 #-------------------------------------------------------
 #------------Auxiliary Parallel functions definition-------------
@@ -40,13 +41,14 @@ def f(AC):
 #-------------------------------------------------------
 
 def inconsistent(C,B,Bd):
-	if not existConsistencyCheck(B):
+	global genhash
+	genhash=hashB=utils.getHash(B,len(modelCNF.clauses))
+	if not existConsistencyCheck(hashB):
 		QXGen([C],[Bd],[utils.Diff(B,Bd)],[Bd],0)
 		time.sleep(lockTime)
-	return (not LookUpCC(B)) #check the shared table
+	return (not LookUpCC(hashB)) #check the shared table
 	
 def quickXplain(C, B):
-
 	if utils.consistencyCheck(C+B):
 		return "No Conflict"
 	elif len(C)==0:
@@ -71,14 +73,22 @@ def QX(C,B,Bo):
 
 
 def QXGen(C, Bd, B, d, l):
+	#print(str(C)+"-"+str(Bd)+"-"+str(B)+"-"+str(d))
+	global genhash
+	#print("oldge: "+genhash)
 	if l< lmax :
 		if f(d)>0 :
 			u=utils.union(B,Bd)
-			hash=utils.getHash(u,len(modelCNF.clauses))
+			if(genhash == ""):
+				hash=utils.getHash(u,len(modelCNF.clauses))
+			else:
+				hash=genhash
+				genhash=""
+
 			if (not (hash in cache)):#evito crear multiples hilos si ya esta en ejecución 
 				future=pool.apply_async(callConsistencyCheck,args=([u]))
 				cache.update({hash:future})
-	
+				#print("Genero: "+str(hash))
 		if f(C)==1 and f(Bd)>0:
 			QXGen(Bd,[],B+[C[0]],[C[0]],l+1)
 		
@@ -104,7 +114,8 @@ if __name__ == '__main__':
 	lmax=2
 	cache={}
 	count=0
-	
+	genhash=""
+
 	sleepTime=0 #can be used to simulate harder problems
 	lockTime=0 #can be used to simulate harder problems
 
@@ -113,9 +124,14 @@ if __name__ == '__main__':
 		requirements=sys.argv[2]
 		lmax=int(sys.argv[3])
 	else:
-		requirements="../QX-Benchmark/cnf/betty/5000_30_0/16-50-4.prod"
-		model="../QX-Benchmark/cnf/betty/5000_30_0.cnf"
-		
+		#requirements="../QX-Benchmark/cnf/betty/5000_30_0/16-50-4.prod"
+		#model="../QX-Benchmark/cnf/betty/5000_30_0.cnf"
+		#requirements="./cnf/bench/frb40-19-1.cnf_prod"
+		#model="./cnf/bench/frb40-19-1.cnf"
+		requirements="./cnf/AutomotiveRQ.cnf"		
+		model="./cnf/LargeAutomotive.dimacs"
+		#requirements="./cnf/TS/QX11_prod.cnf"
+		#model="./cnf/TS/QX11.cnf"
 
 	modelCNF = CNF(from_file=model)
 	requirementsCNF = CNF(from_file=requirements)
@@ -128,5 +144,5 @@ if __name__ == '__main__':
 	starttime = time.time()
 	result= quickXplain(C,B)
 	reqtime = time.time() - starttime
-	print(os.path.dirname(requirements)+"|"+os.path.basename(requirements)+"|"+str(reqtime)+"|"+str(count+1)+"|"+str(len(cache)+1)+"|"+str(lmax)+"|"+str(result))
+	print(os.path.dirname(requirements)+"|"+os.path.basename(requirements)+"|"+str(reqtime)+"|"+str(count+1)+"|"+str(len(cache))+"|"+str(lmax)+"|"+str(result))
 	pool.close()
