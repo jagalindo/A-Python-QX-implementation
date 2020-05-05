@@ -1,8 +1,10 @@
 from pysat.solvers import Glucose3
 import pickle as pickle
 import sys
-
-
+import os
+import tempfile
+from pysat.formula import CNF
+import time
 def getHash(C,l): 
     #print(str(C))
     #smallList=list(filter(lambda x: x[0] > l, C))
@@ -23,10 +25,24 @@ def Diff(x, y):
     li_dif = [item for item in x if item not in y]
     return li_dif
 
-def consistencyCheck(AC):
-    g = Glucose3()
-    for clause in AC: #AC es conjunto de conjuntos
-        g.add_clause(clause[1])#añadimos la constraint
-    sol=g.solve()
-    return sol
+#def consistencyCheck(AC):
+#    g = Glucose3()
+#    for clause in AC: #AC es conjunto de conjuntos
+#        g.add_clause(clause[1])#añadimos la constraint
+#    sol=g.solve()
+#    return sol
 
+def consistencyCheck(AC):
+    f = tempfile.NamedTemporaryFile()
+    cnf = CNF()
+    for clause in AC: #AC es conjunto de conjuntos
+        cnf.append(clause[1])#añadimos la constraint
+    cnf.to_file(f.name)
+    out=os.popen("java -jar org.sat4j.core.jar "+f.name).read()
+    f.close()
+
+    if "UNSATISFIABLE" in out:
+        return False
+    else:
+        return True
+    

@@ -115,19 +115,22 @@ if __name__ == '__main__':
 	else:
 		requirements="../QX-Benchmark/cnf/betty/model-5000-50-1/model-5000-50-1-100-0.prod"
 		model="../QX-Benchmark/cnf/betty/model-5000-50-1.cnf"
-		requirements="./cnf/AutomotiveRQ.cnf"
-		model="./cnf/LargeAutomotive.dimacs"
-		#requirements="./cnf/bench/frb59-26-1.cnf_prod"
-		#model="./cnf/bench/frb59-26-1.cnf"
+		#requirements="./cnf/AutomotiveRQ.cnf"
+		#model="./cnf/LargeAutomotive.dimacs"
+		#requirements="./cnf/bench/frb40-19-1.cnf_prod"
+		#model="./cnf/bench/frb40-19-1.cnf"
+		#requirements="./cnf/ecos-icse11.dimacs_prod"
+		#model="./cnf/ecos-icse11.dimacs"
+		
 
-	modelCNF = CNF(from_file=requirements)
-	requirementsCNF = CNF(from_file=model)
+	modelCNF = CNF(from_file=model)
+	requirementsCNF = CNF(from_file=requirements)
 
 	#Vamos a almacenar el id con la C
 	B=sorted(enumerate(modelCNF.clauses,0), key=lambda x: x[0])
 	C=sorted(enumerate(requirementsCNF.clauses,len(modelCNF.clauses)), key=lambda x: x[0])
 
-	pool = mp.Pool(mp.cpu_count()-1)
+	pool = mp.Pool(mp.cpu_count())
 	starttime = time.time()
 	result= quickXplain(C,B)
 	reqtime = time.time() - starttime

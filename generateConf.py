@@ -2,7 +2,7 @@ from pysat.formula import CNF
 from random import randint
 from pysat.solvers import Glucose3
 
-model="./cnf/bench/frb59-26-1.cnf"
+model="./cnf/bench/frb40-19-1.cnf"
 modelCNF = CNF(from_file=model)
 numberOfRequirements=10
 hasSolution = True
@@ -23,4 +23,4 @@ while hasSolution:
             requirementsCNF.append([value])	
     hasSolution= isConsistent(requirementsCNF.clauses + modelCNF.clauses)
 
-requirementsCNF.to_file('./cnf/bench/frb59-26-1.cnf_prod')
+requirementsCNF.to_file('./cnf/bench/frb40-19-1.cnf_prod')
