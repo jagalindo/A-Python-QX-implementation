@@ -12,6 +12,9 @@ count=0
 def callConsistencyCheck(AC):
 	global count
 	count=count+1
+	utils.getHash(AC,len(modelCNF.clauses))
+	utils.getHash(AC,len(modelCNF.clauses))
+
 	sol=utils.consistencyCheck(AC)
 	time.sleep(sleepTime)
 	return sol
@@ -48,8 +51,8 @@ if __name__ == '__main__':
 		requirements=sys.argv[2]
 
 	else :
-		requirements="../QX-Benchmark/cnf/betty/model-5000-50-1/model-5000-50-1-100-0.prod"
-		model="../QX-Benchmark/cnf/betty/model-5000-50-1.cnf"
+		requirements="../QX-Benchmark/cnf/betty/5000_30_0/16-50-4.prod"
+		model="../QX-Benchmark/cnf/betty/5000_30_0.cnf"
 		#requirements="./cnf/AutomotiveRQ.cnf"
 		#model="./cnf/LargeAutomotive.dimacs"
 		#requirements="./cnf/bench/frb59-26-1.cnf_prod"
@@ -70,4 +73,4 @@ if __name__ == '__main__':
 	starttime = time.time()
 	result= quickXplain(RQ_C,M_C)
 	reqtime = time.time() - starttime
-	print(os.path.basename(requirements).replace(".prod","").replace("model-","").replace("-","|")+"|"+str(reqtime)+"|"+str(count)+"|"+str(count)+"|"+"qx|0|"+str(result))
+	print(os.path.dirname(requirements)+"|"+os.path.basename(requirements)+"|"+str(reqtime)+"|"+str(count)+"|"+str(count)+"|"+str(0)+"|"+str(result))

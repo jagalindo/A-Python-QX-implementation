@@ -101,7 +101,7 @@ def QXGen(C, Bd, B, d, l):
 #--------------Gloval variable definition---------------
 #-------------------------------------------------------
 if __name__ == '__main__':
-	lmax=1
+	lmax=2
 	cache={}
 	count=0
 	
@@ -113,14 +113,8 @@ if __name__ == '__main__':
 		requirements=sys.argv[2]
 		lmax=int(sys.argv[3])
 	else:
-		requirements="../QX-Benchmark/cnf/betty/model-5000-50-1/model-5000-50-1-100-0.prod"
-		model="../QX-Benchmark/cnf/betty/model-5000-50-1.cnf"
-		#requirements="./cnf/AutomotiveRQ.cnf"
-		#model="./cnf/LargeAutomotive.dimacs"
-		#requirements="./cnf/bench/frb40-19-1.cnf_prod"
-		#model="./cnf/bench/frb40-19-1.cnf"
-		#requirements="./cnf/ecos-icse11.dimacs_prod"
-		#model="./cnf/ecos-icse11.dimacs"
+		requirements="../QX-Benchmark/cnf/betty/5000_30_0/16-50-4.prod"
+		model="../QX-Benchmark/cnf/betty/5000_30_0.cnf"
 		
 
 	modelCNF = CNF(from_file=model)
@@ -134,5 +128,5 @@ if __name__ == '__main__':
 	starttime = time.time()
 	result= quickXplain(C,B)
 	reqtime = time.time() - starttime
-	print(os.path.basename(requirements).replace(".prod","").replace("model-","").replace("-","|")+"|"+str(reqtime)+"|"+str(count+1)+"|"+str(len(cache)+1)+"|"+"qx_parallel_mp|"+str(lmax)+"|"+str(result))
+	print(os.path.dirname(requirements)+"|"+os.path.basename(requirements)+"|"+str(reqtime)+"|"+str(count+1)+"|"+str(len(cache)+1)+"|"+str(lmax)+"|"+str(result))
 	pool.close()
