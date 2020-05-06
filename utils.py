@@ -39,7 +39,11 @@ def consistencyCheck(AC):
     for clause in AC: #AC es conjunto de conjuntos
         cnf.append(clause[1])#añadimos la constraint
     cnf.to_file(f.name)
+    starttime = time.time()
     out=os.popen("java -jar org.sat4j.core.jar "+f.name).read()
+    reqtime = time.time() - starttime
+    print(str(reqtime*10))
+    time.sleep(reqtime*10)
     f.close()
 
     if "UNSATISFIABLE" in out:
