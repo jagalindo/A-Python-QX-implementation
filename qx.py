@@ -13,6 +13,9 @@ def callConsistencyCheck(AC):
 	global count
 	count=count+1
 	utils.getHash(AC,len(modelCNF.clauses))
+	utils.getHash(AC,len(modelCNF.clauses))
+	utils.getHash(AC,len(modelCNF.clauses))
+	utils.getHash(AC,len(modelCNF.clauses))
 	sol=utils.consistencyCheck(AC)
 	time.sleep(sleepTime)
 	return sol
