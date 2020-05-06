@@ -42,18 +42,13 @@ def f(AC):
 
 def inconsistent(C,B,Bd):
 	global genhash
-	if genhash=="":
-		hashB=genhash=utils.getHash(B,len(modelCNF.clauses))
+	genhash=hashB=utils.getHash(B,len(modelCNF.clauses))
 	if not existConsistencyCheck(hashB):
 		QXGen([C],[Bd],[utils.Diff(B,Bd)],[Bd],0)
 		time.sleep(lockTime)
 	return (not LookUpCC(hashB)) #check the shared table
 	
 def quickXplain(C, B):
-	global genhash
-	genhash=utils.getHash(B,len(modelCNF.clauses))
-	future=pool.apply_async(callConsistencyCheck,args=(B))
-	cache.update({genhash:future})
 	if utils.consistencyCheck(C+B):
 		return "No Conflict"
 	elif len(C)==0:
