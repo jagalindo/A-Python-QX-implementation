@@ -12,10 +12,8 @@ count=0
 def callConsistencyCheck(AC):
 	global count
 	count=count+1
-	utils.getHash(AC,len(modelCNF.clauses))
-	utils.getHash(AC,len(modelCNF.clauses))
-	utils.getHash(AC,len(modelCNF.clauses))
-	utils.getHash(AC,len(modelCNF.clauses))
+	for _ in range(lmax):
+		utils.getHash(AC,len(modelCNF.clauses))
 	sol=utils.consistencyCheck(AC)
 	time.sleep(sleepTime)
 	return sol
@@ -50,6 +48,7 @@ if __name__ == '__main__':
 	if len(sys.argv) > 1:
 		model=sys.argv[1]
 		requirements=sys.argv[2]
+		lmax=int(sys.argv[3])
 
 	else :
 		#requirements="../QX-Benchmark/cnf/betty/5000_30_0/16-50-4.prod"
