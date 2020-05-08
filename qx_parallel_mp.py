@@ -73,9 +73,7 @@ def QX(C,B,Bo):
 
 
 def QXGen(C, Bd, B, d, l):
-	#print(str(C)+"-"+str(Bd)+"-"+str(B)+"-"+str(d))
 	global genhash
-	#print("oldge: "+genhash)
 	if l< lmax :
 		if f(d)>0 :
 			u=utils.union(B,Bd)
@@ -124,14 +122,10 @@ if __name__ == '__main__':
 		requirements=sys.argv[2]
 		lmax=int(sys.argv[3])
 	else:
-		#requirements="../QX-Benchmark/cnf/betty/5000_30_0/16-50-4.prod"
-		#model="../QX-Benchmark/cnf/betty/5000_30_0.cnf"
-		#requirements="./cnf/bench/frb40-19-1.cnf_prod"
-		#model="./cnf/bench/frb40-19-1.cnf"
-		requirements="./cnf/AutomotiveRQ.cnf"		
-		model="./cnf/LargeAutomotive.dimacs"
-		#requirements="./cnf/TS/QX11_prod.cnf"
-		#model="./cnf/TS/QX11.cnf"
+		#requirements="./cnf/AutomotiveRQ.cnf"		
+		#model="./cnf/LargeAutomotive.dimacs"
+		requirements="./cnf/bench/prod-16-7.prod"
+		model="./cnf/bench/model_16.cnf"
 
 	modelCNF = CNF(from_file=model)
 	requirementsCNF = CNF(from_file=requirements)

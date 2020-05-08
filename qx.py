@@ -51,13 +51,14 @@ if __name__ == '__main__':
 		lmax=int(sys.argv[3])
 
 	else :
+		lmax=int(0)
 		#requirements="../QX-Benchmark/cnf/betty/5000_30_0/16-50-4.prod"
 		#model="../QX-Benchmark/cnf/betty/5000_30_0.cnf"
-		requirements="./cnf/AutomotiveRQ.cnf"		
+		#requirements="./cnf/AutomotiveRQ.cnf"		
 		#requirements="./cnf/auto_fail.cnf"
-		model="./cnf/LargeAutomotive.dimacs"
-		#requirements="./cnf/bench/frb59-26-1.cnf_prod"
-		#model="./cnf/bench/frb59-26-1.cnf"
+		#model="./cnf/LargeAutomotive.dimacs"
+		requirements="./cnf/bench/prod-2-3.prod"
+		model="./cnf/bench/model_2.cnf"
 		#requirements="./cnf/ecos-icse11.dimacs_prod"
 		#model="./cnf/ecos-icse11.dimacs"
 		#requirements="./cnf/TS/QX11_prod.cnf"
