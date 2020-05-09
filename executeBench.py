@@ -7,5 +7,7 @@ for i in cc:
         productPath="./cnf/bench/prod-"+i+"-"+str(j)+".prod"
         #create product in cnf
         for lmax in ["1","2"] :
-            os.system("python3 ./qx.py " + modelPath + " "+productPath+" "+lmax+" >>"+ " result.csv")
-            os.system("python3 ./qx_parallel_mp.py " + modelPath + " "+productPath+" "+lmax+" >>"+ " result.csv")
+            for solver in ["Glucose3","Sat4j"]
+                for difficulty in ["0","300","400","500"]:
+                    os.system("python3 ./qx.py " + modelPath + " "+productPath+" "+lmax+" "+solver+" "+difficulty+" >>"+ " result.csv")
+                    os.system("python3 ./qx_parallel_mp.py " + modelPath + " "+productPath+" "+lmax+" "+solver+" "+difficulty+" >>"+ " result.csv")

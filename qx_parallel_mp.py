@@ -27,8 +27,8 @@ def existConsistencyCheck(hash):
 #-------------------------------------------------------
 
 def callConsistencyCheck(AC):
-	sol=utils.consistencyCheck(AC)
-	time.sleep(sleepTime)
+	global solver, difficulty
+	sol=utils.consistencyCheck(AC,solver,difficulty)
 	return sol
 
 def f(AC):
@@ -45,11 +45,11 @@ def inconsistent(C,B,Bd):
 	genhash=hashB=utils.getHash(B,len(modelCNF.clauses))
 	if not existConsistencyCheck(hashB):
 		QXGen([C],[Bd],[utils.Diff(B,Bd)],[Bd],0)
-		time.sleep(lockTime)
 	return (not LookUpCC(hashB)) #check the shared table
 	
 def quickXplain(C, B):
-	if utils.consistencyCheck(C+B):
+	global solver, difficulty
+	if utils.consistencyCheck(C+B,solver, difficulty):
 		return "No Conflict"
 	elif len(C)==0:
 		return []
@@ -114,18 +114,18 @@ if __name__ == '__main__':
 	count=0
 	genhash=""
 
-	sleepTime=0 #can be used to simulate harder problems
-	lockTime=0 #can be used to simulate harder problems
-
 	if len(sys.argv) > 1:
 		model=sys.argv[1]
 		requirements=sys.argv[2]
 		lmax=int(sys.argv[3])
+		solver=sys.argv[4]
+		difficulty=int(sys.argv[3])
 	else:
-		#requirements="./cnf/AutomotiveRQ.cnf"		
-		#model="./cnf/LargeAutomotive.dimacs"
-		requirements="./cnf/bench/prod-16-7.prod"
-		model="./cnf/bench/model_16.cnf"
+		lmax=int(0)
+		requirements="./cnf/bench/prod-2-3.prod"
+		model="./cnf/bench/model_2.cnf"
+		solver="Sat4j"
+		difficulty=int(0)
 
 	modelCNF = CNF(from_file=model)
 	requirementsCNF = CNF(from_file=requirements)
@@ -138,6 +138,6 @@ if __name__ == '__main__':
 	starttime = time.time()
 	result= quickXplain(C,B)
 	reqtime = time.time() - starttime
-	print(os.path.dirname(requirements)+"|"+os.path.basename(requirements)+"|"+str(reqtime)+"|"+str(count+1)+"|"+str(len(cache))+"|"+str(lmax)+"|pqx|"+str(result))
+	print(os.path.dirname(requirements)+"|"+os.path.basename(requirements)+"|"+str(reqtime)+"|"+str(count+1)+"|"+str(len(cache))+"|"+str(lmax)+"|pqx|"+solver+"|"+str(difficulty)+str(result))
 	pool.close()
 	pool.terminate()
