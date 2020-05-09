@@ -48,8 +48,21 @@ def consistencyCheck(AC,solver,difficulty):
         reqtime = time.time() - starttime
         time.sleep(reqtime*difficulty)
         return sol
-    elif solver == "Choco":
-        raise ValueError("Choco Solver not defined")
+    elif solver == "Choco4":
+        f = tempfile.NamedTemporaryFile()
+        cnf = CNF()
+        for clause in AC: #AC es conjunto de conjuntos
+            cnf.append(clause[1])#añadimos la constraint
+        cnf.to_file(f.name)
+        starttime = time.time()
+        out=os.popen("java -jar choco4solver.jar "+f.name).read()
+        f.close()
+        reqtime = time.time() - starttime
+        time.sleep(reqtime*difficulty)
+        if "UNSATISFIABLE" in out:
+            return False
+        else:
+            return True
     else :
         raise ValueError("Solver not defined")
     
