@@ -138,6 +138,6 @@ if __name__ == '__main__':
 	starttime = time.time()
 	result= quickXplain(C,B)
 	reqtime = time.time() - starttime
-	print(os.path.dirname(requirements)+"|"+os.path.basename(requirements)+"|"+str(reqtime)+"|"+str(count+1)+"|"+str(len(cache))+"|"+str(lmax)+"|"+str(result))
+	print(os.path.dirname(requirements)+"|"+os.path.basename(requirements)+"|"+str(reqtime)+"|"+str(count+1)+"|"+str(len(cache))+"|"+str(lmax)+"|pqx|"+str(result))
 	pool.close()
 	pool.terminate()

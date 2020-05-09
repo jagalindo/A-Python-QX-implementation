@@ -628,15 +628,8 @@ c var 537 = F76
 c var 471 = F75
 c var 540 = F78
 c var 539 = F77
-c var 1007 = MCS_6
 c var 541 = F79
-c var 1008 = MCS_7
-c var 1003 = MCS_2
-c var 1004 = MCS_3
-c var 1005 = MCS_4
-c var 1006 = MCS_5
 c var 1001 = MCS_0
-c var 1002 = MCS_1
 c var 4 = F81
 c var 542 = F80
 c var 104 = F83
@@ -1007,7 +1000,7 @@ c var 130 = F579
 c var 936 = F337
 c var 845 = F338
 c var 855 = F339
-p cnf 1008 60
+p cnf 1001 53
 295 0
 83 0
 924 0
@@ -1061,10 +1054,3 @@ p cnf 1008 60
 257 0
 585 0
 1001 0
-1002 0
-1003 0
-1004 0
-1005 0
-1006 0
-1007 0
-1008 0

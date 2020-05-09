@@ -76,4 +76,4 @@ if __name__ == '__main__':
 	starttime = time.time()
 	result= quickXplain(RQ_C,M_C)
 	reqtime = time.time() - starttime
-	print(os.path.dirname(requirements)+"|"+os.path.basename(requirements)+"|"+str(reqtime)+"|"+str(count)+"|"+str(count)+"|"+str(0)+"|"+str(result))
+	print(os.path.dirname(requirements)+"|"+os.path.basename(requirements)+"|"+str(reqtime)+"|"+str(count)+"|"+str(count)+"|"+str(lmax)+"|qx|"+str(result))
