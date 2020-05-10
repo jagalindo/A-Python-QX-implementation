@@ -119,7 +119,8 @@ if __name__ == '__main__':
 		requirements=sys.argv[2]
 		lmax=int(sys.argv[3])
 		solver=sys.argv[4]
-		difficulty=int(sys.argv[3])
+		difficulty=sys.argv[5]
+		difficulty=int(sys.argv[5])
 	else:
 		lmax=int(0)
 		requirements="./cnf/bench/prod-2-3.prod"
@@ -138,6 +139,6 @@ if __name__ == '__main__':
 	starttime = time.time()
 	result= quickXplain(C,B)
 	reqtime = time.time() - starttime
-	print(os.path.dirname(requirements)+"|"+os.path.basename(requirements)+"|"+str(reqtime)+"|"+str(count+1)+"|"+str(len(cache))+"|"+str(lmax)+"|pqx|"+solver+"|"+str(difficulty)+str(result))
+	print(model+"|"+requirements+"|"+str(reqtime)+"|"+str(count+1)+"|"+str(len(cache))+"|"+str(lmax)+"|pqx|"+solver+"|"+str(difficulty)+"|"+str(result))
 	pool.close()
 	pool.terminate()

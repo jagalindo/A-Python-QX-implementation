@@ -48,7 +48,7 @@ if __name__ == '__main__':
 		requirements=sys.argv[2]
 		lmax=int(sys.argv[3])
 		solver=sys.argv[4]
-		difficulty=int(sys.argv[3])
+		difficulty=int(sys.argv[5])
 
 	else : #Default values
 		lmax=int(0)
@@ -65,4 +65,4 @@ if __name__ == '__main__':
 	starttime = time.time()
 	result= quickXplain(RQ_C,M_C)
 	reqtime = time.time() - starttime
-	print(os.path.dirname(requirements)+"|"+os.path.basename(requirements)+"|"+str(reqtime)+"|"+str(count)+"|"+str(count)+"|"+str(lmax)+"|qx|"+solver+"|"+str(difficulty)+"|"+str(result))
+	print(model+"|"+requirements+"|"+str(reqtime)+"|"+str(count)+"|"+str(count)+"|"+str(lmax)+"|qx|"+solver+"|"+str(difficulty)+"|"+str(result))
