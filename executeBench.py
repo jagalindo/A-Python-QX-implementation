@@ -17,7 +17,7 @@ for i in cc:
                             os.system("python3 ./qx_parallel_mp.py " + modelPath + " "+productPath+" "+lmax+" "+solver+" "+difficulty+" >>"+ " result.csv")
 
 reqtime = time.time() - starttime
-print("GlucoseSat4j time: "+reqtime)
+print("GlucoseSat4j time: "+str(reqtime))
 
 for i in cc:
     modelPath="./cnf/bench/model_"+i+".cnf"
@@ -31,4 +31,4 @@ for i in cc:
                             os.system("python3 ./qx_parallel_mp.py " + modelPath + " "+productPath+" "+lmax+" "+solver+" "+difficulty+" >>"+ " result_choco4.csv")
 
 reqtime = time.time() - starttime
-print("Choco4 time: "+reqtime)
+print("Choco4 time: "+(reqtime))
